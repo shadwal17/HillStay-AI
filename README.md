@@ -46,3 +46,24 @@ The platform provides a direct booking system integrated with AI-powered travel 
 ## Status
 
 Project Planning and Repository Setup
+
+
+## Week 5: Database Integration
+
+### Database Choice: MongoDB Atlas
+
+I chose MongoDB (via MongoDB Atlas) because its document-based NoSQL structure provides excellent flexibility for storing varying room details and booking information without requiring rigid migrations. It pairs seamlessly with Node.js and Mongoose.
+
+### Set up the database:
+
+1. Create a free MongoDB Atlas cluster.
+2. Under "Database Access", create a user with a password.
+3. Under "Network Access", whitelist your IP address.
+4. Click "Connect", choose "Connect your application", and copy the connection string.
+5. Create a `.env` file in the `backend` folder and add: `MONGO_URI=your_connection_string_here`
+6. Run `node seed.js` to populate initial rooms.
+7. Run `npm run dev` to start the server.
+
+### Schema Diagram
+
+*(Deliverable 2: See the W5_SchemaDiagram_TBI-26100593.pdf submitted via the LMS form for the complete visual schema).*
