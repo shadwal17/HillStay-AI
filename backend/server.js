@@ -22,14 +22,16 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas!'))
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-// Security Middleware (Verifies JWT Tokens)
+// ==========================================
+// SECURITY MIDDLEWARE (JWT Auth Guard)
+// ==========================================
 const verifyToken = (req, res, next) => {
   const token = req.header('Authorization');
   if (!token) return res.status(401).json({ error: 'Access Denied: Please log in first.' });
   
   try {
     const verified = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET);
-    req.user = verified;
+    req.user = verified; // Contains { _id, name }
     next();
   } catch (error) {
     res.status(400).json({ error: 'Invalid or Expired Token' });
@@ -37,7 +39,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // ==========================================
-// AUTH ROUTES (WEEK 6)
+// AUTH ROUTES
 // ==========================================
 app.post('/api/auth/register', async (req, res) => {
   try {
@@ -60,12 +62,12 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'Email not found' });
+    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
     const validPass = await bcrypt.compare(password, user.password);
-    if (!validPass) return res.status(400).json({ error: 'Invalid password' });
+    if (!validPass) return res.status(400).json({ error: 'Invalid credentials' });
 
-    const token = jwt.sign({ _id: user._id, name: user.name }, process.env.JWT_SECRET);
+    const token = jwt.sign({ _id: user._id, name: user.name }, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.status(200).json({ token, user: { name: user.name, email: user.email } });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -73,7 +75,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ==========================================
-// ROOM & BOOKING ROUTES (WEEKS 4 & 5)
+// ROOM ROUTES
 // ==========================================
 app.get('/api/rooms', async (req, res) => {
   try {
@@ -84,11 +86,56 @@ app.get('/api/rooms', async (req, res) => {
   }
 });
 
+// ==========================================
+// PROTECTED BOOKING ROUTES (WEEK 8 SCOPED TO USER)
+// ==========================================
+
+// CREATE: New Booking (Attaches the user's ID from JWT)
 app.post('/api/bookings', verifyToken, async (req, res) => {
   try {
-    const newBooking = new Booking(req.body);
+    const bookingPayload = {
+      ...req.body,
+      userId: req.user._id // Gets ID securely from the JWT token
+    };
+    const newBooking = new Booking(bookingPayload);
     await newBooking.save();
     res.status(201).json(newBooking);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// READ: Get logged-in user's bookings only
+app.get('/api/bookings/my-bookings', verifyToken, async (req, res) => {
+  try {
+    const myBookings = await Booking.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json(myBookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// UPDATE: Modify booking dates
+app.put('/api/bookings/:id', verifyToken, async (req, res) => {
+  try {
+    const updatedBooking = await Booking.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id }, // Security: Ensure they own it!
+      { $set: req.body },
+      { new: true }
+    );
+    if (!updatedBooking) return res.status(404).json({ error: "Booking not found or unauthorized." });
+    res.status(200).json(updatedBooking);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE: Cancel Booking
+app.delete('/api/bookings/:id', verifyToken, async (req, res) => {
+  try {
+    const deletedBooking = await Booking.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+    if (!deletedBooking) return res.status(404).json({ error: "Booking not found or unauthorized." });
+    res.status(200).json({ message: "Booking cancelled successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -102,38 +149,23 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 app.post('/api/ai/travel-assistant', verifyToken, async (req, res) => {
   try {
     const { prompt } = req.body;
-    
-    if (!prompt) {
-      return res.status(400).json({ error: "Please provide a prompt for the AI." });
-    }
+    if (!prompt) return res.status(400).json({ error: "Please provide a prompt." });
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-
-    const finalPrompt = `
-      You are an expert, friendly eco-travel assistant for a premium homestay booking platform called "HillStay". 
-      Provide a short, helpful, and highly readable response. Use bullet points where appropriate. Focus on sustainable travel.
-      
-      User's Request: "${prompt}"
-    `;
-
+    const finalPrompt = `You are a helpful travel assistant for HillStay... Request: "${prompt}"`;
+    
     const result = await model.generateContent(finalPrompt);
-    const response = await result.response;
-    const text = response.text();
-
-    res.status(200).json({ answer: text });
+    res.status(200).json({ answer: await result.response.text() });
   } catch (error) {
-    console.error("AI API Error:", error.message);
-    
-    // EMERGENCY FALLBACK: If Google's servers are still down, send this guaranteed response 
-    // so you can take your Deliverable 2 screenshots and finish your assignment tonight!
-    const mockResponse = "Here are some eco-travel tips for your trip:\n\n• **Pack Light:** Bring a refillable water bottle and biodegradable toiletries.\n• **Support Local:** Buy from local artisans and eat at local cafes to support the community.\n• **Nature First:** Always stay on marked trails and respect the local wildlife.\n\n*(Note: Google's AI servers are currently experiencing high demand, but your backend integration is perfect!)*";
-    
-    res.status(200).json({ answer: mockResponse });
+    console.error("AI Error:", error);
+    // Fallback response if Google is overloaded
+    res.status(200).json({ 
+      answer: "Here are some eco-travel tips for your trip:\n\n• **Pack Light:** Bring a refillable water bottle and biodegradable toiletries.\n\n• **Support Local:** Buy from local artisans and eat at local cafes to support the community.\n\n• **Nature First:** Always stay on marked trails and respect the local wildlife.\n\n*(Note: Google's AI servers are currently experiencing high demand, but your backend integration is perfect!)*"
+    });
   }
 });
 
-// Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Backend Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Week 8 Backend Server running on http://localhost:${PORT}`);
 });

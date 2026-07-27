@@ -12,7 +12,6 @@ export default function Home({ user, setCurrentPage }) {
   
   const today = new Date().toISOString().split('T')[0];
   const [searchDates, setSearchDates] = useState({ checkIn: '', checkOut: '' });
-  const [guests, setGuests] = useState(2);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -82,9 +81,15 @@ export default function Home({ user, setCurrentPage }) {
 
     setIsBooking(true);
     try {
+      // Get the token from localStorage
+      const token = localStorage.getItem('token');
+
       const response = await fetch('http://localhost:5000/api/bookings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // <--- THIS FIXES THE BOOKING ISSUE!
+        },
         body: JSON.stringify({
           roomId: selectedRoom.id || selectedRoom._id,
           guestName: guestName,
@@ -93,20 +98,23 @@ export default function Home({ user, setCurrentPage }) {
         })
       });
       
+      const data = await response.json();
+
       if (response.ok) {
         showToast(`Success! Your stay at ${selectedRoom.name} is confirmed.`);
         setIsModalOpen(false);
       } else {
-        throw new Error("Failed to book");
+        throw new Error(data.error || "Failed to book");
       }
     } catch (err) {
-      showToast("Error processing booking. Please try again.", "error");
+      showToast(err.message || "Error processing booking. Please try again.", "error");
     }
     setIsBooking(false);
   };
 
   return (
     <div className="w-full">
+      {/* Toast Notification */}
       {toastMsg.text && (
         <div className={`fixed top-24 right-6 px-6 py-4 shadow-2xl z-50 font-bold text-sm flex items-center gap-3 transition-all border-l-4 ${
           toastMsg.type === 'error' ? 'bg-white text-slate-900 border-red-500' : 'bg-slate-900 text-white border-emerald-500'
