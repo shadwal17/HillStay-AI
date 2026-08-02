@@ -20,7 +20,7 @@ export default function Home({ user, setCurrentPage }) {
   const [toastMsg, setToastMsg] = useState({ text: '', type: '' }); 
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/rooms')
+    fetch('[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)/api/rooms')
       .then(res => res.json())
       .then(data => {
         setRooms(data);
@@ -84,7 +84,7 @@ export default function Home({ user, setCurrentPage }) {
       // Get the token from localStorage
       const token = localStorage.getItem('token');
 
-      const response = await fetch('http://localhost:5000/api/bookings', {
+      const response = await fetch('[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)/api/bookings', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

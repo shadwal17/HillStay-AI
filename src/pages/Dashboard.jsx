@@ -54,7 +54,7 @@ function DashboardContent({ setCurrentPage, user }) {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/bookings/my-bookings', {
+      const response = await fetch('[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)/api/bookings/my-bookings', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -91,7 +91,7 @@ function DashboardContent({ setCurrentPage, user }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/bookings/${id}`, {
+      const response = await fetch(`[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)/api/bookings/${id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ function DashboardContent({ setCurrentPage, user }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/bookings/${id}`, {
+      const response = await fetch(`[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)/api/bookings/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
