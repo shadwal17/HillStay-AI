@@ -12,7 +12,7 @@ export default function Login({ handleLogin }) {
     const endpoint = isRegistering ? '/api/auth/register' : '/api/auth/login';
 
     try {
-      const response = await fetch(`[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)${endpoint}`, {
+      const response = await fetch(`https://hillstay-ai-1.onrender.com${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

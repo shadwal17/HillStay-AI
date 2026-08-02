@@ -24,7 +24,7 @@ export default function AIAssistant({ user }) {
     try {
       const token = localStorage.getItem('token');
       
-      const res = await fetch('[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)/api/ai/travel-assistant', {
+      const res = await fetch('https://hillstay-ai-1.onrender.com/api/ai/travel-assistant', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

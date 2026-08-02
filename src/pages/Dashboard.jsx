@@ -117,7 +117,7 @@ function DashboardContent({ setCurrentPage, user }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)/api/bookings/${id}`, {
+      const response = await fetch('[https://hillstay-ai-1.onrender.com/api/bookings/$](https://hillstay-ai-1.onrender.com/api/bookings/$){id}', {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
