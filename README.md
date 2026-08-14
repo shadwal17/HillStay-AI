@@ -1,69 +1,65 @@
-# HillStay AI
+HillStay AI - Premium Eco-Homestay Booking Engine
+A full-stack, responsive web application designed to connect travelers with premium, sustainable eco-resorts, featuring an AI-powered travel assistant.
 
-## Project Overview
+🚀 Live Links
+Live Frontend Application (Vercel): https://hill-stay-ai.vercel.app/
 
-HillStay AI is an AI-assisted smart tourism and homestay booking platform that enables travelers to discover, plan, and book homestay experiences through a single platform. The system combines direct booking functionality with intelligent travel assistance to provide a seamless tourism experience.
+Live Backend API (Render): https://hillstay-ai-1.onrender.com
 
-## Problem Statement
+📸 Screenshots
+(Note to recruiters: Screenshots of the dashboard, booking flow, and AI assistant can be viewed in the live application or the attached project documentation).
 
-Many homestay businesses rely on third-party booking platforms that charge high commission fees and limit direct interaction with customers. Travelers also struggle to find personalized recommendations and efficient trip planning tools.
+✨ Features
+Authentication: Secure user registration and login using JWT and bcrypt.
 
-## Proposed Solution
+Smart Booking: Full CRUD (Create, Read, Update, Delete) reservation management.
 
-The platform provides a direct booking system integrated with AI-powered travel assistance. Users can explore homestays, check availability, make booking inquiries, receive personalized recommendations, and generate customized travel itineraries.
+AI Concierge: Integrated Google Gemini AI to provide eco-travel itineraries and packing lists.
 
-## Core Features
+Responsive UI: Fully optimized for mobile, tablet, and desktop viewing.
 
-* Homestay Listing & Search
-* Direct Booking System
-* Availability Calendar
-* AI Travel Assistant
-* Personalized Itinerary Generator
-* User Reviews & Ratings
+💻 Tech Stack
+Frontend: React.js (Vite), Tailwind CSS, Lucide React
 
-## Tech Stack
+Backend: Node.js, Express.js
 
-### Frontend
+Database: MongoDB Atlas, Mongoose
 
-* React.js
-* HTML5
-* CSS3
-* JavaScript
+AI Integration: Google Generative AI SDK (Gemini 1.5)
 
-### Backend
+Deployment: Vercel (Frontend), Render (Backend)
 
-* Node.js
-* Express.js
+🛠️ Setup Instructions (Local Development)
+Clone the repository: git clone https://github.com/shadwal17/HillStay-AI.git
 
-### Database
+Install Frontend: npm install and run with npm run dev
 
-* MongoDB
+Install Backend: cd backend, run npm install, and start with npm run dev
 
-### AI Integration
+Environment Variables Needed:
 
-* Gemini API
+MONGO_URI (Your MongoDB connection string)
 
-## Status
+JWT_SECRET (Your secure token signing key)
 
-Project Planning and Repository Setup
+GEMINI_API_KEY (Your Google AI Studio key)
 
+📡 API Documentation (Core Endpoints)
+POST /api/auth/register - Create a new user
 
-## Week 5: Database Integration
+POST /api/auth/login - Authenticate and receive JWT
 
-### Database Choice: MongoDB Atlas
+GET /api/bookings/my-bookings - Fetch user-specific reservations (Requires JWT)
 
-I chose MongoDB (via MongoDB Atlas) because its document-based NoSQL structure provides excellent flexibility for storing varying room details and booking information without requiring rigid migrations. It pairs seamlessly with Node.js and Mongoose.
+POST /api/bookings - Create a new reservation (Requires JWT)
 
-### Set up the database:
+POST /api/ai/travel-assistant - Send a prompt to the AI Concierge (Requires JWT)
 
-1. Create a free MongoDB Atlas cluster.
-2. Under "Database Access", create a user with a password.
-3. Under "Network Access", whitelist your IP address.
-4. Click "Connect", choose "Connect your application", and copy the connection string.
-5. Create a `.env` file in the `backend` folder and add: `MONGO_URI=your_connection_string_here`
-6. Run `node seed.js` to populate initial rooms.
-7. Run `npm run dev` to start the server.
+📂 Architecture
+The project follows a standard decoupled MERN stack architecture. The React frontend handles UI state and routing, communicating asynchronously via HTTP requests to the Express backend. The backend utilizes controller logic and middleware (for JWT validation) before interacting with the MongoDB database.
 
-### Schema Diagram
+⚠️ Known Limitations
+Render Cold Starts: The backend API is hosted on Render's free tier. If idle, the server spins down. The very first request (like logging in) may take 30–60 seconds to process while the server wakes up.
 
-*(Deliverable 2: See the W5_SchemaDiagram_TBI-26100593.pdf submitted via the LMS form for the complete visual schema).*
+🤝 Credits & Acknowledgements
+Built during the Full Stack Web Development Internship at Technology Business Incubator - Graphic Era University (TBI-GEU).
