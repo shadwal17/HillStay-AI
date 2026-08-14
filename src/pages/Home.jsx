@@ -84,7 +84,7 @@ export default function Home({ user, setCurrentPage }) {
       // Get the token from localStorage
       const token = localStorage.getItem('token');
 
-      fetch('[https://hillstay-ai-1.onrender.com/api/bookings](https://hillstay-ai-1.onrender.com/api/bookings)', {
+      fetch('[https://hillstay-ai-1.onrender.com/api/bookings](https://hillstay-ai-1.onrender.com/api/bookings)')
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
