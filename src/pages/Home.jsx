@@ -20,7 +20,7 @@ export default function Home({ user, setCurrentPage }) {
   const [toastMsg, setToastMsg] = useState({ text: '', type: '' }); 
 
   useEffect(() => {
-    fetch('[https://hillstay-ai-1.onrender.com](https://hillstay-ai-1.onrender.com)/api/rooms')
+    fetch('[https://hillstay-ai-1.onrender.com/api/rooms](https://hillstay-ai-1.onrender.com/api/rooms)')
       .then(res => res.json())
       .then(data => {
         setRooms(data);
